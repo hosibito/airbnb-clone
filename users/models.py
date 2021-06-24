@@ -32,7 +32,6 @@ class User(AbstractUser):
         (CURRENCY_KRW, "KRW"),
     )
 
-    # null 은 DB blank 는 form(없으면 required)
     avatar = models.ImageField(blank=True)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=10, blank=True)
     bio = models.TextField(blank=True)
@@ -40,3 +39,7 @@ class User(AbstractUser):
     language = models.CharField(choices=LANGUAGE_CHOICES, max_length=2, blank=True)
     currency = models.CharField(choices=CURRENCY_CHOICES, max_length=3, blank=True)
     superhost = models.BooleanField(default=False)
+    """
+        # null 은 DB blank 는 form(없으면 required)
+        # choices는 DB에 영향을 주지 않는다. from에 영향줌
+    """
