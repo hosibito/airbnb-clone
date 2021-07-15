@@ -90,7 +90,9 @@ class Room(core_models.TimeStampedModel):
     # host = models.ForeignKey(user_models.User, on_delete=models.CASCADE)
     host = models.ForeignKey("users.User", on_delete=models.CASCADE)  # 3 참조
     room_type = models.ForeignKey("RoomType", on_delete=models.SET_NULL, null=True)
-    amenities = models.ManyToManyField("Amenity", blank=True)
+    amenities = models.ManyToManyField(
+        "Amenity", blank=True
+    )  # related_name="rooms" 기본값 room_set
     facilities = models.ManyToManyField(Facility, blank=True)
     house_rules = models.ManyToManyField(HouseRule, blank=True)
 
