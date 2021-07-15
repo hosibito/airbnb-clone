@@ -39,3 +39,4 @@ class CostomUserAdmin(UserAdmin):
 
 
 # 장고의 UserAdmin 에 기본적으로 설정이 들어가 있으므로 그걸 상속받은후 h_Custom Profile을 추가해준다.
+# class CostomUserAdmin(admin.ModelAdmin):

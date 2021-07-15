@@ -26,6 +26,7 @@ class RoomType(AbstractItem):  # 하단설명 2 참조
     class Meta:
         verbose_name = "Room Type"
         ordering = ["name", "create"]
+        #  ordering = ["name", "-create"]
 
     """
     Entire place, Private room, Hotel room, Shared room
