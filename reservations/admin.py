@@ -8,4 +8,14 @@ class ReservationAdmin(admin.ModelAdmin):
 
     """Reservation Admin Definition"""
 
-    pass
+    list_display = (
+        "room",
+        "guest",
+        "status",
+        "check_in",
+        "check_out",
+        "in_progress",
+        "in_finished",
+    )
+
+    list_filter = ("status",)

@@ -62,7 +62,7 @@ class Photo(core_models.TimeStampedModel):
     """Photo Model Definition"""
 
     caption = models.CharField(max_length=80)
-    file = models.ImageField()
+    file = models.ImageField(upload_to="room_photos")
     # room = models.ForeignKey(Room, on_delete=models.CASCADE) Room 정의가 밑에있어서 에러
     room = models.ForeignKey("Room", on_delete=models.CASCADE)  # 하단설명 3 참조
 
@@ -98,6 +98,19 @@ class Room(core_models.TimeStampedModel):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):  # 노트 8.8 참조
+        # print(self.city)
+        self.city = str.capitalize(self.city)  # 첫글자 대문자로
+        super().save(*args, **kwargs)
+
+    def total_rating(self):  # 4 참조
+        all_reviews = self.review_set.all()
+        all_rating = 0
+        for review in all_reviews:
+            # print(review.rating_average())
+            all_rating += review.rating_average()
+        return all_rating / len(all_reviews)
 
 
 """   1 
@@ -141,4 +154,11 @@ class Room(core_models.TimeStampedModel):
     host = models.ForeignKey("users.User", on_delete=models.CASCADE)  
     이렇게 사용가능... ( 앱이름.모델클래스명 )
 
+"""
+
+""" 4
+    review 에 Room 이 연결되어 있으므로 self.review_set.all() 으로 정보를 가져올수 있다. 
+    룸에 딸린 리뷰가 여러개일것이므로 for 문을 돌린다. 
+    각각의 리뷰안에 평균 점수를 내는 함수 rating_average() 사용 
+    점수를 가져와서 전부 더한후 전체 리뷰갯수로나눠준다.  
 """
