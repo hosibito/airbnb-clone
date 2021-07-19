@@ -37,12 +37,12 @@ class Review(core_models.TimeStampedModel):
 
 
 """  1
-    ForeignKey 에 정의된것을 {self.room.name} : {self.user.username} 식으로 불러올수 있다. 
+    ForeignKey 에 정의된것을 {self.room.name} : {self.user.username} 식으로 불러올수 있다.
     self.room.host.username  같이 순환참조 가능
 """
 
 """ 2
     함수로 표시될수 있는것을 만들수 있다.
     model 에 만들면 전체에서 다 이용하가능하고
-    admin 에서 만들면 admin 에서만 이용가능하다. 
+    admin 에서 만들면 admin 에서만 이용가능하다.
 """

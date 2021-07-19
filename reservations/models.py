@@ -31,7 +31,7 @@ class Reservation(core_models.TimeStampedModel):
 
     def in_progress(self):
         now = timezone.now().date()
-        return now > self.check_in and now <= self.check_out
+        return now >= self.check_in and now <= self.check_out
 
     in_progress.boolean = True  # x 기호로 표시
 
@@ -49,7 +49,7 @@ class Reservation(core_models.TimeStampedModel):
     """
 
     """ 2
-        장고에서는 파이선 Time 를 쓰지 않는다. 장고에서 관리하는 
+        장고에서는 파이선 Time 를 쓰지 않는다. 장고에서 관리하는
         TIME_ZONE = "Asia/Seoul" 기준시간을 사용할수 있게하기 위해(서버시간을 가져와서 저 설정에 맞는 시간으로 고쳐진다. )
-        어플리케이션 서버의 타임을 알고있기를 원하니까. 
+        어플리케이션 서버의 타임을 알고있기를 원하니까.
     """
