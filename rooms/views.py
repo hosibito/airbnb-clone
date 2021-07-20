@@ -1,5 +1,5 @@
 from django.utils import timezone
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 from . import models
 
@@ -24,6 +24,25 @@ class HomeView(ListView):
         # print(dir(context))
         # print(dir(context["page_obj"]))
 
+
+class RoomDetail(DetailView):
+
+    """ RoomDetail Definition """
+
+    model = models.Room
+
+
+""" note # 12 함수형 detailvoew(404관련포함)
+from django.http import Http404
+from django.shortcuts import render
+
+def room_detail(request, pk):
+    try:
+        room = models.Room.objects.get(pk=pk)
+        return render(request, "rooms/detail.html", {"room": room})
+    except models.Room.DoesNotExist:
+        raise Http404()
+"""
 
 """ note # 11 페이지3 클래스형
 from django.views.generic import ListView

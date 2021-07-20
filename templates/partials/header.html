@@ -1,6 +1,16 @@
 <header>
-    <a href="/">Nbnb</a>
+    <a href="{% url 'core:home' %}">Nbnb</a>               
     <ul>
         <li><a href="#">Login</a></li>
     </ul>
 </header> 
+
+
+
+<!-- ======================================================================= -->
+{% comment "학습 정보 모음"%}
+    <!-- url 이름을 안쓸때-->
+        <a href="/">Nbnb</a> 
+
+{% endcomment %}
+    

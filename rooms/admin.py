@@ -69,6 +69,7 @@ class RoomAdmin(admin.ModelAdmin):
         "count_amenities",  # 2 manytomanyfield 는 list_display에 표시할수 없으므로 함수로 만들어 표시한다.
         "count_photos",
         "total_rating",
+        "create",
     )
 
     ordering = ("name", "price")

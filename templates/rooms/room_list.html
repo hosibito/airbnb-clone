@@ -1,8 +1,16 @@
 {% extends 'base.html' %}
 
+{% block page_name %}
+    Home
+{% endblock page_name %}
+
 {% block content %} 
     {% for room in object_list %}
-        <h1>{{ room.name }} / ${{ room.price }}</h1>
+        <h3>
+            <a href="{% url 'rooms:detail' room.pk %}"> 
+                {{room.name}} / ${{room.price}}
+            </a>
+        </h3>        
     {% endfor %}  
 
     <h5> Page {{page_obj.number}} of {{page_obj.paginator.num_pages}} </h5>
@@ -26,8 +34,10 @@
 {% endblock content %}
 
 
-<!-- ===============참고용 코드 보관 ======================== -->
-{% comment "note # 11 페이지1(100%수동)" %}    
+<!-- =================================================================== -->
+{% comment "참고용 코드 보관" %}  
+
+    <!-- note # 11 페이지1(100%수동) -->
     {% for room in rooms %}
         <h1>{{ room.name }} / ${{ room.price }}</h1>
     {% endfor %}
@@ -49,6 +59,14 @@
             <a href="?page={{page|add:1}}">Next</a>
         {% endif %}
     </h5>
+
+    <!-- urls 이름을 안쓸때 (주소값으로 처리)-->
+    <h3>
+        <a href="/rooms/{{ room.pk }}">
+            {{room.name}} / ${{room.price}}
+        </a>
+    </h3>
+    
 {% endcomment %}
     
     
