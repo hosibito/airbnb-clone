@@ -3,9 +3,8 @@ from django.views.generic import ListView, DetailView
 
 from django.shortcuts import render
 
-from django_countries import countries
-
 from . import models
+from . import forms
 
 
 class HomeView(ListView):
@@ -37,6 +36,177 @@ class RoomDetail(DetailView):
 
 
 def search(request):
+    country = request.GET.get("country")
+
+    if country:
+        form = forms.SearchForm(request.GET)
+        # 입력된 정보를 기억한다. bounded form 이 되어 데이터 무결성 검사를 하게된다.
+
+        if form.is_valid():  # 폼 데이터가 무결성인지 알려준다.
+            print(form.cleaned_data)
+            # {'city': 'Anywhere', 'country': 'KR', ...
+            city = form.cleaned_data.get("city")
+            country = form.cleaned_data.get("country")
+            room_type = form.cleaned_data.get("room_type")
+            price = form.cleaned_data.get("price")
+            guests = form.cleaned_data.get("guests")
+            bedrooms = form.cleaned_data.get("bedrooms")
+            beds = form.cleaned_data.get("beds")
+            baths = form.cleaned_data.get("baths")
+            instant_book = form.cleaned_data.get("instant_book")
+            superhost = form.cleaned_data.get("superhost")
+            amenities = form.cleaned_data.get("amenities")
+            facilities = form.cleaned_data.get("facilities")
+            houserules = form.cleaned_data.get("houserules")
+
+            filter_args = {}
+
+            if city != "Anywhere":
+                filter_args["city__startswith"] = city
+
+            filter_args["country"] = country
+
+            if room_type is not None:
+                filter_args["room_type"] = room_type
+
+            if price is not None:
+                filter_args["price__lte"] = price
+
+            if guests is not None:
+                filter_args["guests__gte"] = guests
+
+            if bedrooms is not None:
+                filter_args["bedrooms__gte"] = bedrooms
+
+            if beds is not None:
+                filter_args["beds__gte"] = beds
+
+            if baths is not None:
+                filter_args["baths__gte"] = baths
+
+            if instant_book is True:
+                filter_args["instant_book"] = True
+
+            if superhost is True:
+                filter_args["host__superhost"] = True
+
+            for s_ame in amenities:
+                filter_args["amenities"] = s_ame
+
+            for s_facil in facilities:
+                filter_args["facilities"] = s_facil
+
+            for s_h_rule in houserules:
+                filter_args["house_rules"] = s_h_rule
+
+            print(filter_args)
+
+            rooms = models.Room.objects.filter(**filter_args)
+    else:
+        form = forms.SearchForm()   # unbounded form
+
+    return render(request, "rooms/search.html", {"form": form, "rooms": rooms})
+
+
+"""
+=== 함수형 serch 구현 
+def search(request):
+    country = request.GET.get("country")
+
+    if country:
+        form = forms.SearchForm(request.GET)
+        # 입력된 정보를 기억한다. bounded form 이 되어 데이터 무결성 검사를 하게된다.
+
+        if form.is_valid():  # 폼 데이터가 무결성인지 알려준다.
+            print(form.cleaned_data)
+            # {'city': 'Anywhere', 'country': 'KR', ...
+            city = form.cleaned_data.get("city")
+            country = form.cleaned_data.get("country")
+            room_type = form.cleaned_data.get("room_type")
+            price = form.cleaned_data.get("price")
+            guests = form.cleaned_data.get("guests")
+            bedrooms = form.cleaned_data.get("bedrooms")
+            beds = form.cleaned_data.get("beds")
+            baths = form.cleaned_data.get("baths")
+            instant_book = form.cleaned_data.get("instant_book")
+            superhost = form.cleaned_data.get("superhost")
+            amenities = form.cleaned_data.get("amenities")
+            facilities = form.cleaned_data.get("facilities")
+            houserules = form.cleaned_data.get("houserules")
+
+            filter_args = {}
+
+            if city != "Anywhere":
+                filter_args["city__startswith"] = city
+
+            filter_args["country"] = country
+
+            if room_type is not None:
+                filter_args["room_type"] = room_type
+
+            if price is not None:
+                filter_args["price__lte"] = price
+
+            if guests is not None:
+                filter_args["guests__gte"] = guests
+
+            if bedrooms is not None:
+                filter_args["bedrooms__gte"] = bedrooms
+
+            if beds is not None:
+                filter_args["beds__gte"] = beds
+
+            if baths is not None:
+                filter_args["baths__gte"] = baths
+
+            if instant_book is True:
+                filter_args["instant_book"] = True
+
+            if superhost is True:
+                filter_args["host__superhost"] = True
+
+            for s_ame in amenities:
+                filter_args["amenities"] = s_ame
+
+            for s_facil in facilities:
+                filter_args["facilities"] = s_facil
+
+            for s_h_rule in houserules:
+                filter_args["house_rules"] = s_h_rule
+
+            print(filter_args)
+
+            rooms = models.Room.objects.filter(**filter_args)
+    else:
+        form = forms.SearchForm()   # unbounded form
+
+    return render(request, "rooms/search.html", {"form": form, "rooms": rooms})
+
+=====#13 SEARCHVIEW - serch를 Django forms를 -이용해서 구현 입력값 저장하는법!=============
+def search(request):
+
+    country = request.GET.get("country")
+
+    if country:
+        form = forms.SearchForm(request.GET)
+        # 입력된 정보를 기억한다. bounded form 이 되어 데이터 무결성 검사를 하게된다.
+        if form.is_valid():  # 폼 데이터가 무결성인지 알려준다.
+            print(form.cleaned_data)
+            # {'city': 'Anywhere', 'country': 'KR', 'room_type': <RoomType: Hotel room>,
+            # 'price': 200, 'guests': None, 'bedrooms': None, 'beds': None,
+            # 'baths': None, 'instant_book': False, 'superhost': False,
+            # 'amenities':
+            # <QuerySet [<Amenity: 샤워>, <Amenity: Wi-Fi>, <Amenity: Washer>]>,
+            # 'facilities': <QuerySet []>, 'houserules': <QuerySet []>}
+
+    else:
+        form = forms.SearchForm()   # unbounded form
+
+    return render(request, "rooms/search.html", {"form": form})
+
+
+======note # 13 serch를 장고 도움없이 쌩으로 구현 3 1=============
+def search(request):
     # form
     # print(countries)  # <django_countries.Countries object at 0x00000194E4EEE940>
     room_types = models.RoomType.objects.all()
@@ -59,7 +229,8 @@ def search(request):
     s_amenities = request.GET.getlist("amenities")
     s_facilities = request.GET.getlist("facilities")
     s_house_rules = request.GET.getlist("house_rules")
-    # print(s_amenities, s_facilities, s_house_rules)  # ['3', '7', '11'] ['3', '4'] ['1']
+    # print(s_amenities, s_facilities, s_house_rules)
+    # ['3', '7', '11'] ['3', '4'] ['1']
 
     form = {
         "city": city,
@@ -138,8 +309,6 @@ def search(request):
     return render(request, "rooms/search.html", {**form, **choices, "rooms": rooms})
 
 
-""" note # 13 serch를 장고 도움없이 쌩으로 구현 3 1
-
     --- 비추천 방법 ----
     qs = models.Room.objects.filter().filter().filter()
 
@@ -148,7 +317,7 @@ def search(request):
 
     if bedrooms != 0:
         qs = qs.filter(price__lte=bedrooms)
-    
+
     ---추천 방법---
     filter_args = {}
 
@@ -160,7 +329,8 @@ def search(request):
     rooms = models.Room.objects.filter(**filter_args)
 
     print(rooms)
-    # <QuerySet [<Room: Piece magazine leave nature.>, <Room: Conference behind key small base TV.>]>
+    # <QuerySet [<Room: Piece magazine leave nature.>,
+    # <Room: Conference behind key small base TV.>]>
 """
 
 """ note # 12 함수형 detailvoew(404관련포함)
