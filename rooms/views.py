@@ -1,6 +1,10 @@
 from django.utils import timezone
 from django.views.generic import ListView, DetailView
 
+from django.shortcuts import render
+
+from django_countries import countries
+
 from . import models
 
 
@@ -31,6 +35,133 @@ class RoomDetail(DetailView):
 
     model = models.Room
 
+
+def search(request):
+    # form
+    # print(countries)  # <django_countries.Countries object at 0x00000194E4EEE940>
+    room_types = models.RoomType.objects.all()
+    amenities = models.Amenity.objects.all()
+    facilities = models.Facility.objects.all()
+    house_rules = models.HouseRule.objects.all()
+
+    # choices
+    city = str.capitalize(request.GET.get("city", "Anywhere"))
+    country = request.GET.get("country", "KR")
+    room_type = int(request.GET.get("room_type", 0))
+    price = int(request.GET.get("price", 0))
+    guests = int(request.GET.get("guests", 0))
+    bedrooms = int(request.GET.get("bedrooms", 0))
+    beds = int(request.GET.get("beds", 0))
+    baths = int(request.GET.get("baths", 0))
+    instant = bool(request.GET.get("instant", False))  # 그냥두면 on / False 이므로
+    superhost = bool(request.GET.get("superhost", False))
+    # print(instant, super_host)  # False on
+    s_amenities = request.GET.getlist("amenities")
+    s_facilities = request.GET.getlist("facilities")
+    s_house_rules = request.GET.getlist("house_rules")
+    # print(s_amenities, s_facilities, s_house_rules)  # ['3', '7', '11'] ['3', '4'] ['1']
+
+    form = {
+        "city": city,
+        "s_country": country,
+        "s_room_type": room_type,
+        "price": price,
+        "guests": guests,
+        "bedrooms": bedrooms,
+        "beds": beds,
+        "baths": baths,
+        "instant": instant,
+        "superhost": superhost,
+        "s_amenities": s_amenities,
+        "s_facilities": s_facilities,
+        "s_house_rules": s_house_rules,
+    }
+
+    choices = {
+        "countries": countries,
+        "room_types": room_types,
+        "amenities": amenities,
+        "facilities": facilities,
+        "house_rules": house_rules,
+    }
+
+    filter_args = {}
+
+    if city != "Anywhere":
+        filter_args["city__startswith"] = city
+
+    filter_args["country"] = country
+
+    if room_type != 0:
+        filter_args["room_type__pk"] = room_type
+
+    if price != 0:
+        filter_args["price__lte"] = price
+
+    if guests != 0:
+        filter_args["guests__gte"] = guests
+
+    if bedrooms != 0:
+        filter_args["bedrooms__gte"] = bedrooms
+
+    if beds != 0:
+        filter_args["beds__gte"] = beds
+
+    if baths != 0:
+        filter_args["baths__gte"] = baths
+
+    if instant is True:
+        filter_args["instant_book"] = True
+
+    if superhost is True:
+        filter_args["host__superhost"] = True
+
+    # print(s_amenities)  # ['1', '2', '3']
+    if len(s_amenities) > 0:
+        for s_ame in s_amenities:
+            filter_args["amenities__pk"] = int(s_ame)
+
+    if len(s_facilities) > 0:
+        for s_facil in s_facilities:
+            filter_args["facilities__pk"] = int(s_facil)
+
+    if len(s_house_rules) > 0:
+        for s_h_rule in s_house_rules:
+            filter_args["house_rules__pk"] = int(s_h_rule)
+
+    # print(filter_args)
+
+    rooms = models.Room.objects.filter(**filter_args)
+
+    print(rooms)
+
+    return render(request, "rooms/search.html", {**form, **choices, "rooms": rooms})
+
+
+""" note # 13 serch를 장고 도움없이 쌩으로 구현 3 1
+
+    --- 비추천 방법 ----
+    qs = models.Room.objects.filter().filter().filter()
+
+    if price != 0:
+        qs = qs.filter(price__lte=price)
+
+    if bedrooms != 0:
+        qs = qs.filter(price__lte=bedrooms)
+    
+    ---추천 방법---
+    filter_args = {}
+
+    if price != 0:
+        filter_args["price__lte"] = price
+
+    print(filter_args)  # {'price__lte': 30}
+
+    rooms = models.Room.objects.filter(**filter_args)
+
+    print(rooms)
+    # <QuerySet [<Room: Piece magazine leave nature.>, <Room: Conference behind key small base TV.>]>
+"""
 
 """ note # 12 함수형 detailvoew(404관련포함)
 from django.http import Http404
