@@ -1,7 +1,9 @@
 from django.utils import timezone
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, View
+from django.core.paginator import EmptyPage, Paginator
 
-from django.shortcuts import render
+from django.urls import reverse
+from django.shortcuts import redirect, render
 
 from . import models
 from . import forms
@@ -35,81 +37,98 @@ class RoomDetail(DetailView):
     model = models.Room
 
 
-def search(request):
-    country = request.GET.get("country")
+class SearchView(View):
 
-    if country:
-        form = forms.SearchForm(request.GET)
-        # 입력된 정보를 기억한다. bounded form 이 되어 데이터 무결성 검사를 하게된다.
+    """ SearchView Definition """
 
-        if form.is_valid():  # 폼 데이터가 무결성인지 알려준다.
-            print(form.cleaned_data)
-            # {'city': 'Anywhere', 'country': 'KR', ...
-            city = form.cleaned_data.get("city")
-            country = form.cleaned_data.get("country")
-            room_type = form.cleaned_data.get("room_type")
-            price = form.cleaned_data.get("price")
-            guests = form.cleaned_data.get("guests")
-            bedrooms = form.cleaned_data.get("bedrooms")
-            beds = form.cleaned_data.get("beds")
-            baths = form.cleaned_data.get("baths")
-            instant_book = form.cleaned_data.get("instant_book")
-            superhost = form.cleaned_data.get("superhost")
-            amenities = form.cleaned_data.get("amenities")
-            facilities = form.cleaned_data.get("facilities")
-            houserules = form.cleaned_data.get("houserules")
+    def get(self, request):
+        country = request.GET.get("country")
 
-            filter_args = {}
+        if country:
+            form = forms.SearchForm(request.GET)
+            # 입력된 정보를 기억한다. bounded form 이 되어 데이터 무결성 검사를 하게된다.
 
-            if city != "Anywhere":
-                filter_args["city__startswith"] = city
+            if form.is_valid():  # 폼 데이터가 무결성인지 알려준다.
+                # print(form.cleaned_data)
+                # {'city': 'Anywhere', 'country': 'KR', ...
+                city = form.cleaned_data.get("city")
+                country = form.cleaned_data.get("country")
+                room_type = form.cleaned_data.get("room_type")
+                price = form.cleaned_data.get("price")
+                guests = form.cleaned_data.get("guests")
+                bedrooms = form.cleaned_data.get("bedrooms")
+                beds = form.cleaned_data.get("beds")
+                baths = form.cleaned_data.get("baths")
+                instant_book = form.cleaned_data.get("instant_book")
+                superhost = form.cleaned_data.get("superhost")
+                amenities = form.cleaned_data.get("amenities")
+                facilities = form.cleaned_data.get("facilities")
+                houserules = form.cleaned_data.get("houserules")
 
-            filter_args["country"] = country
+                filter_args = {}
 
-            if room_type is not None:
-                filter_args["room_type"] = room_type
+                if city != "Anywhere":
+                    filter_args["city__startswith"] = city
 
-            if price is not None:
-                filter_args["price__lte"] = price
+                filter_args["country"] = country
 
-            if guests is not None:
-                filter_args["guests__gte"] = guests
+                if room_type is not None:
+                    filter_args["room_type"] = room_type
 
-            if bedrooms is not None:
-                filter_args["bedrooms__gte"] = bedrooms
+                if price is not None:
+                    filter_args["price__lte"] = price
 
-            if beds is not None:
-                filter_args["beds__gte"] = beds
+                if guests is not None:
+                    filter_args["guests__gte"] = guests
 
-            if baths is not None:
-                filter_args["baths__gte"] = baths
+                if bedrooms is not None:
+                    filter_args["bedrooms__gte"] = bedrooms
 
-            if instant_book is True:
-                filter_args["instant_book"] = True
+                if beds is not None:
+                    filter_args["beds__gte"] = beds
 
-            if superhost is True:
-                filter_args["host__superhost"] = True
+                if baths is not None:
+                    filter_args["baths__gte"] = baths
 
-            for s_ame in amenities:
-                filter_args["amenities"] = s_ame
+                if instant_book is True:
+                    filter_args["instant_book"] = True
 
-            for s_facil in facilities:
-                filter_args["facilities"] = s_facil
+                if superhost is True:
+                    filter_args["host__superhost"] = True
 
-            for s_h_rule in houserules:
-                filter_args["house_rules"] = s_h_rule
+                for s_ame in amenities:
+                    filter_args["amenities"] = s_ame
 
-            print(filter_args)
+                for s_facil in facilities:
+                    filter_args["facilities"] = s_facil
 
-            rooms = models.Room.objects.filter(**filter_args)
-    else:
-        form = forms.SearchForm()   # unbounded form
+                for s_h_rule in houserules:
+                    filter_args["house_rules"] = s_h_rule
 
-    return render(request, "rooms/search.html", {"form": form, "rooms": rooms})
+                # print(filter_args)
+
+                page = request.GET.get("page", 1)
+                filtered_rooms = models.Room.objects.filter(
+                    **filter_args).order_by("create")
+                paginator = Paginator(filtered_rooms, 10, orphans=4)
+
+                try:
+                    page_obj = paginator.page(int(page))
+                    return render(request, "rooms/search.html", {
+                        "form": form,
+                        "page_obj": page_obj,
+                        })
+                except EmptyPage:
+                    return redirect(reverse("core:home"))
+
+        else:
+            form = forms.SearchForm()   # unbounded form
+
+        return render(request, "rooms/search.html", {"form": form})
 
 
 """
-=== 함수형 serch 구현 
+=== 함수형 serch 구현
 def search(request):
     country = request.GET.get("country")
 
