@@ -5,12 +5,13 @@ from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import authenticate, login, logout
 
-from . import forms as users_forms
+from . import forms as user_forms
+from . import models as user_models
 
 
 class LoginView(FormView):
     template_name = "users/login.html"
-    form_class = users_forms.LoginForm   # () 없음에 주의
+    form_class = user_forms.LoginForm   # () 없음에 주의
     success_url = reverse_lazy("core:home")  # url을 부를때 생성
 
     def form_valid(self, form):
@@ -29,11 +30,11 @@ class LoginView(FormView):
 class LoginView_old(View):
 
     def get(self, request):
-        form = users_forms.LoginForm(initial={"email": "test@test.com"})  # 기본값
+        form = user_forms.LoginForm(initial={"email": "test@test.com"})  # 기본값
         return render(request, "users/login.html", {"form": form})
 
     def post(self, request):
-        form = users_forms.LoginForm(request.POST)  # 입력된값 저장. bounced form
+        form = user_forms.LoginForm(request.POST)  # 입력된값 저장. bounced form
         # print(form.is_valid())  # True
         if form.is_valid():
             # print(form.cleaned_data)  # {'email': 'lalalalal', 'password': 'lalala'}
@@ -53,7 +54,7 @@ def log_out(request):
 
 class SignUpView(FormView):
     template_name = "users/signup.html"
-    form_class = users_forms.SignUpForm
+    form_class = user_forms.SignUpForm
     success_url = reverse_lazy("core:home")
 
     initial = {  # 폼에 들어갈 기본 데이터를 미리 입력
@@ -69,7 +70,22 @@ class SignUpView(FormView):
         user = authenticate(self.request, username=email, password=password)
         if user is not None:
             login(self.request, user)
+        user.verify_email()  # 모델안의 이메일 보내는 함수 호출
         return super().form_valid(form)
+
+
+def complete_verification(request, key):
+    try:
+        user = user_models.User.objects.get(email_secret=key)
+        user.email_verified = True
+        user.email_secret = ""
+        user.save()
+        # to do: add succes message
+    except user_models.User.DoesNotExist:
+        # to do: add error message
+        pass
+    return redirect(reverse("core:home"))
+    
 
 
 ''' #4 USER LOG IN & LOG OUT

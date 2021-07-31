@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6a49492b948e4a707f415ba8ba6fc6b9072f7299d52bb8c4556e67d2cd718e8a"
+            "sha256": "d72e044daedb90b653af4fa205fdcc2fc7e0456910d21b13ed70c205e280939c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -32,6 +32,14 @@
             "index": "pypi",
             "version": "==7.2.1"
         },
+        "django-dotenv": {
+            "hashes": [
+                "sha256:3812bb0f4876cf31f902aad140f0645e120e51ee30eb7c40c22050f58a0e4adb",
+                "sha256:a9b1b40a70bd321acd231926acedb9bd2c5e873e33a1873b34a7276d196a765e"
+            ],
+            "index": "pypi",
+            "version": "==1.4.2"
+        },
         "django-seed": {
             "hashes": [
                 "sha256:5cdda71dcd51b2e7340e4aec9035d99d7014409a4b11adddbdff17d814968221"
@@ -41,11 +49,11 @@
         },
         "faker": {
             "hashes": [
-                "sha256:9ac6b39b9618f55be6b8b45089e624564469a035cc845c69ce990332ce3663f4",
-                "sha256:a665e6e2e9087ec9ad4ebcd2f09acd031b44193ee93401817001b6557c6502b4"
+                "sha256:771b21ab55924867ac865f4b0c2f547c200172293b1056be16289584ef1215cb",
+                "sha256:f27a2a5c34042752f9d5fea2a9667aed5265d7d7bdd5ce83bc03b2f8a540d148"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==8.10.1"
+            "version": "==8.10.3"
         },
         "pillow": {
             "hashes": [
@@ -272,11 +280,11 @@
         },
         "tomli": {
             "hashes": [
-                "sha256:0713b16ff91df8638a6a694e295c8159ab35ba93e3424a626dd5226d386057be",
-                "sha256:be670d0d8d7570fd0ea0113bd7bb1ba3ac6706b4de062cc4c952769355c9c268"
+                "sha256:056f0376bf5a6b182c513f9582c1e5b0487265eb6c48842b69aa9ca1cd5f640a",
+                "sha256:d60e681734099207a6add7a10326bc2ddd1fdc36c1b0f547d00ef73ac63739c2"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==1.0.4"
+            "version": "==1.2.0"
         }
     }
 }

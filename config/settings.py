@@ -145,10 +145,19 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")  # BASE_DIR/upload/ 에 다운받
 MEDIA_URL = "/media/"  # 주소에 베이스주소/media  가 들어오면 MEDIA_ROOT 와 연결한다.  "/media/" 는 절대경로 주소 "media/"는 상대경로 주소
 
 
+# Email 설정
+EMAIL_HOST = "smtp.mailgun.org"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get("MAILGUN_USERNAME")
+EMAIL_HOST_PASSWORD = os.environ.get("MAILGUN_PASSWORD")
+EMAIL_FROM = "hosidjango@sandbox7f64143c09b64948bc15ba1044812710.mailgun.org"
 
-''' 1 
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+
+''' 1
     BASE_DIR/upload/ 에 다운받은것들이 저장된다.
         file = models.ImageField(upload_to="room_photos")
-        avatar = models.ImageField(upload_to="avatars", blank=True) 
-        이미지 필드에 업로드 장소를 지정해 줄수 있게 된다. 
+        avatar = models.ImageField(upload_to="avatars", blank=True)
+        이미지 필드에 업로드 장소를 지정해 줄수 있게 된다.
 '''
