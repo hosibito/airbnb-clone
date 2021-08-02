@@ -1,5 +1,5 @@
 from django import forms
-
+from django.contrib.auth.forms import UserCreationForm
 from . import models
 
 
@@ -23,6 +23,16 @@ class LoginForm(forms.Form):
             # raise forms.ValidationError("User does not exist")
             self.add_error("email", forms.ValidationError("User does not exist"))
 
+
+class SignUpForm(UserCreationForm):
+    class Meta:
+        model = models.User  # 모델지정
+        fields = ("username", "first_name", "last_name")
+
+    username = forms.EmailField(label="Email")
+
+
+"""
 
 class SignUpForm(forms.ModelForm):  # 모델폼 이용
     class Meta:
@@ -53,8 +63,7 @@ class SignUpForm(forms.ModelForm):  # 모델폼 이용
         user.username = email   # 이렇게 옵션을 추가하기 위해 commit 하지 않은 상태의 데이터가 필요!
         user.set_password(password)  # 암호화된 페스워드를 준다.
         user.save()
-
-
+"""
 
 """
 ModelForm 을 이용하지 않았을때.. #15 SIGN UP 클래스 형으로 구현.(기본 흐름. ) 참조

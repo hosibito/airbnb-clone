@@ -69,6 +69,30 @@ class SignUpView(FormView):
 
     def form_valid(self, form):
         form.save()
+        username = form.cleaned_data.get("username")
+        password = form.cleaned_data.get("password1")
+        user = authenticate(self.request, username=username, password=password)
+        if user is not None:         
+            user.email = username
+            user.save()          
+            login(self.request, user)
+        user.verify_email()  # 모델안의 이메일 보내는 함수 호출
+        return super().form_valid(form)
+
+
+class SignUpView_old(FormView):  # 18.5 UserCreationForm 참고 사용안함. 위와 비교
+    template_name = "users/signup.html"
+    form_class = user_forms.SignUpForm
+    success_url = reverse_lazy("core:home")
+
+    initial = {  # 폼에 들어갈 기본 데이터를 미리 입력
+        "first_name": "Nicoas",
+        "last_name": "Serr",
+        "email": "itn@las.com",
+        }
+
+    def form_valid(self, form):
+        form.save()
         email = form.cleaned_data.get("email")
         password = form.cleaned_data.get("password")
         user = authenticate(self.request, username=email, password=password)
