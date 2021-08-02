@@ -65,16 +65,16 @@ class SignUpView(FormView):
         "first_name": "Nicoas",
         "last_name": "Serr",
         "email": "itn@las.com",
-        }
+    }
 
     def form_valid(self, form):
         form.save()
         username = form.cleaned_data.get("username")
         password = form.cleaned_data.get("password1")
         user = authenticate(self.request, username=username, password=password)
-        if user is not None:         
+        if user is not None:
             user.email = username
-            user.save()          
+            user.save()
             login(self.request, user)
         user.verify_email()  # 모델안의 이메일 보내는 함수 호출
         return super().form_valid(form)
@@ -89,7 +89,7 @@ class SignUpView_old(FormView):  # 18.5 UserCreationForm 참고 사용안함. �
         "first_name": "Nicoas",
         "last_name": "Serr",
         "email": "itn@las.com",
-        }
+    }
 
     def form_valid(self, form):
         form.save()
@@ -214,7 +214,7 @@ class KakaoException(Exception):
 
 
 def kakao_callback(request):
-    # print(request.GET)  # <QueryDict: {'code': ['61WpYAVoPFXBq...']}>   
+    # print(request.GET)  # <QueryDict: {'code': ['61WpYAVoPFXBq...']}>
     try:
         code = request.GET.get('code')
         REST_API_KEY = os.environ.get("KAKAO_REST_API_KEY")
@@ -245,12 +245,12 @@ def kakao_callback(request):
                         "Authorization": f"Bearer {access_token}"
                     },
                 )
-                # print(api_request.json())            
+                # print(api_request.json())
                 profile_json = api_request.json()
                 # print(profile_json)
                 id = profile_json.get('id')
                 if id is not None:
-                    email = profile_json.get('kakao_account').get('email', None)     
+                    email = profile_json.get('kakao_account').get('email', None)
                     properties = profile_json.get('properties')
                     nickname = properties.get('nickname')
                     profile_image = properties.get('profile_image')
@@ -308,7 +308,7 @@ def github_callback(request):
     code = request.GET.get("code", None)
     if code is not None:
         request = requests.post(
-            f"https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}"        
+            f"https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}"
         )
         print(request)  # <Response [200]>
         print(request.text)  # access_token=gho_gKIzEMnAWHU9...&scope=read%3Auser&token_type=bearer

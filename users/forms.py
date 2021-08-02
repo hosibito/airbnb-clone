@@ -37,7 +37,7 @@ class SignUpForm(UserCreationForm):
 class SignUpForm(forms.ModelForm):  # 모델폼 이용
     class Meta:
         model = models.User  # 모델지정
-        fields = ("first_name", "last_name", "email")  
+        fields = ("first_name", "last_name", "email")
         # 입력 필드 지정(admin 참조)
         # 없는건 디폴트값이 있어야함. (아님 Required 값에서 오류남. )
 

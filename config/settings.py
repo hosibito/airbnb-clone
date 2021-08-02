@@ -142,7 +142,9 @@ AUTH_USER_MODEL = "users.User"
 MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")  # BASE_DIR/upload/ 에 다운받은것들이 저장된다.
 
 # 미디어 주소 / 노트 8 - 3 참조
-MEDIA_URL = "/media/"  # 주소에 베이스주소/media  가 들어오면 MEDIA_ROOT 와 연결한다.  "/media/" 는 절대경로 주소 "media/"는 상대경로 주소
+MEDIA_URL = "/media/"
+# 주소에 베이스주소/media  가 들어오면 MEDIA_ROOT 와 연결한다.
+# "/media/" 는 절대경로 주소 "media/"는 상대경로 주소
 
 
 # Email 설정

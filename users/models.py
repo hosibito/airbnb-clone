@@ -75,9 +75,9 @@ class User(AbstractUser):
             )
             send_mail(
                 "Verify Airbnb Account",
-                strip_tags(html_message),  # html_message가 전달되지 않을경우를 대비해서. 자체를 str로 같이 보낸다. 
+                strip_tags(html_message),  # html_message가 전달되지 않을경우를 대비해서.str로 같이 보낸다.
                 settings.EMAIL_FROM,
-                [self.username],
+                [self.email],
                 fail_silently=False,
                 html_message=html_message
             )
