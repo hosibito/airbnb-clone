@@ -37,6 +37,16 @@ class User(AbstractUser):
         (CURRENCY_KRW, "KRW"),
     )
 
+    LOGIN_EMAIL = "email"
+    LOGIN_GITHUB = "github"
+    LOGING_KAKAO = "kakao"
+
+    LOGIN_CHOICES = (
+        (LOGIN_EMAIL, "Email"),
+        (LOGIN_GITHUB, "Github"),
+        (LOGING_KAKAO, "Kakao"),
+    )
+
     avatar = models.ImageField(upload_to="avatars", blank=True)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=10, blank=True)
     bio = models.TextField(blank=True)
@@ -51,6 +61,10 @@ class User(AbstractUser):
 
     email_verified = models.BooleanField(default=False)
     email_secret = models.CharField(max_length=20, default="", blank=True)
+
+    login_method = models.CharField(
+        max_length=50, choices=LOGIN_CHOICES, default=LOGIN_EMAIL
+    )
 
     def verify_email(self):  # 이메일 확인.. 어디둘지 고민할것.
         if self.email_verified is False:
@@ -69,7 +83,6 @@ class User(AbstractUser):
             )
             self.save()
         return
-
 
     """
         # null 은 DB blank 는 form(없으면 required)

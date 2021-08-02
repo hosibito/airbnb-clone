@@ -1,9 +1,13 @@
+import os
+import requests
+
 from django.views import View
 from django.views.generic import FormView
 
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import authenticate, login, logout
+from requests import models
 
 from . import forms as user_forms
 from . import models as user_models
@@ -85,7 +89,114 @@ def complete_verification(request, key):
         # to do: add error message
         pass
     return redirect(reverse("core:home"))
-    
+
+
+def github_login(request):
+    client_id = os.environ.get("GH_ID")    
+    redirect_uri = "http://127.0.0.1:8000/users/login/github/callback"
+    return redirect(
+        f"https://github.com/login/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&scope=read:user"
+    )
+
+
+class GithubException(Exception):
+    pass
+
+
+def github_callback(request):
+    # print(request.GET)
+    try:
+        client_id = os.environ.get("GH_ID")
+        client_secret = os.environ.get("GH_SECRET")
+        code = request.GET.get("code", None)
+        if code is not None:
+            token_request = requests.post(
+                f"https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}",
+                headers={
+                    "Accept": "application/json"
+                },
+            )
+            # print(result_request.json())
+            # {'access_token': 'gho_WXdmTQ8N...', 'token_type': 'bearer', 'scope': 'read:user'}
+            token_json = token_request.json()
+            error = token_json.get("error", None)
+
+            if error is not None:
+                raise GithubException()
+            else:
+                access_token = token_json.get("access_token")
+                api_request = requests.get(
+                    "https://api.github.com/user",
+                    headers={
+                        "Authorization": f"token {access_token}"
+                    },
+                )
+                # print(api_request.json())
+                # 17 LOG IN WITH GITHUB access_token 으로 user를 받아온다. 확인
+                profile_json = api_request.json()
+                username = profile_json.get('login', None)
+                if username is not None:
+                    name = profile_json.get('name', None)
+                    email = profile_json.get('email', None)
+
+                    if email is None:
+                        # 깃허브에서 이메일정보를 못가져온다. 오류처리할것
+                        raise GithubException()
+
+                    bio = profile_json.get('bio', None)
+                    if bio is None:
+                        bio = ""
+
+                    try:
+                        user = user_models.User.objects.get(email=email)
+                        # 이미 로그인해 있거나. 가입해있는유저
+                        if user.login_method != user_models.User.LOGIN_GITHUB:
+                            # 다른방식으로 가입해 있는 유저
+                            raise GithubException()
+                    except user_models.User.DoesNotExist:
+                        # 새로 가입해야할 유저
+                        user = user_models.User.objects.create(
+                            username=email,
+                            first_name=name,
+                            bio=bio,
+                            email=email,
+                            email_verified=True,
+                            login_method=user_models.User.LOGIN_GITHUB
+                        )
+                        user.set_unusable_password()
+                        user.save()
+
+                    login(request, user)
+                    return redirect(reverse("core:home"))
+                else:
+                    raise GithubException()
+        else:
+            raise GithubException()
+    except GithubException:
+        # 에러메시지 포함시킬것
+        return redirect(reverse("users:login"))
+
+
+
+""" #17 LOG IN WITH GITHUB 
+
+깃허브 로그인 순서대로. _ 기본형
+def github_callback(request):
+    # print(request.GET)
+    client_id = os.environ.get("GH_ID")
+    client_secret = os.environ.get("GH_SECRET")
+    code = request.GET.get("code", None)
+    if code is not None:
+        request = requests.post(
+            f"https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}"        
+        )
+        print(request)  # <Response [200]>
+        print(request.text)  # access_token=gho_gKIzEMnAWHU9...&scope=read%3Auser&token_type=bearer
+
+    else:
+        return redirect(reverse("core:home"))
+
+"""
 
 
 ''' #4 USER LOG IN & LOG OUT
