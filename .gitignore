@@ -140,3 +140,5 @@ cython_debug/
 # 미디어루트
 uploads/
 
+node_mpdules/
+node_modules
