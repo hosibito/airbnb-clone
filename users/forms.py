@@ -5,8 +5,10 @@ from . import models
 
 class LoginForm(forms.Form):
 
-    email = forms.EmailField()
-    password = forms.CharField(widget=forms.PasswordInput)
+    email = forms.EmailField(widget=forms.EmailInput(attrs={"placeholder": "Email"}))
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"placeholder": "Password"})
+    )
 
     def clean(self):
         # print(self.cleaned_data)  # {'email': 'lalalalal', 'password': 'argare'}
@@ -27,9 +29,26 @@ class LoginForm(forms.Form):
 class SignUpForm(UserCreationForm):
     class Meta:
         model = models.User  # 모델지정
-        fields = ("username", "first_name", "last_name")
+        fields = ("first_name", "last_name", "username")
+        widgets = {
+            "first_name": forms.TextInput(attrs={"placeholder": "First Name"}),
+            "last_name": forms.TextInput(attrs={"placeholder": "Last Name"}),
+            "username": forms.EmailInput(attrs={"placeholder": "Email Name"}),
+        }
+        error_messages = {
+            'username': {
+                'unique': '같은 이메일의 유저가 이미 존재합니다. ',
+            },
+        }
 
-    username = forms.EmailField(label="Email")
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={"placeholder": "Password"})
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={"placeholder": "Confirm Password"})
+    )
+
+    # username = forms.EmailField(label="Email")
 
 
 """

@@ -8,13 +8,17 @@
 {% endblock search-bar %}
 
 {% block content %}    
-    <div class="container mx-auto my-10 flex flex-col items-center border p-5 lg:w-5/12 md:w-6/12 xl:w-4/12" >
+    <div class="container mx-auto my-10 flex flex-col items-center border p-5 lg:w-5/12 md:w-6/12 xl:w-4/12 " >
+       
         {% include 'partials/social_login.html' %}
         
-        <form method="POST" action="{% url 'users:login' %}">
-            {% csrf_token %}
-            {{form.as_p}}
-            <button>Login</button>
-        </form>
+        {% include 'mixins/auth/auth_form.html' with form=form cta="Log in" %}
+        <!-- #20 MAKE IT ALL BEAUTIFUL Form 에러 처리(부품으로 만들기) 참고 -->
+
+        <div class="mt-5">
+            <span class="mr-2">Don't have an account?</span>
+            <a href="{% url 'users:signup' %}" class="text-teal-500 font-medium">Sign up</a>
+        </div>
     </div>    
+
 {% endblock content %}
