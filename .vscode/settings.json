@@ -4,6 +4,8 @@
     "python.linting.pylintEnabled": false,
     "python.linting.enabled": true,
     "editor.formatOnSave": true,
-    "python.formatting.provider": "black",
-    "python.linting.flake8Args": ["--ignore=E501"]
+    "python.formatting.provider": "black",    
+    "python.linting.flake8Args": ["--ignore=E501"],
+    "css.remoteStyleSheets": ["https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"],
+    
 }
